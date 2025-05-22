@@ -1,0 +1,29 @@
+services:
+    pgadmin:
+        image: dpage/pgadmin4:latest
+        environment:
+            PGADMIN_DEFAULT_EMAIL: admin@gmail.com
+            PGADMIN_DEFAULT_PASSWORD: admin
+        ports:
+            - "8080:80"
+        networks:
+            - mynetwork
+    db:
+        image: postgres:latest
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_DB: dyslexia
+        ports:
+            - "5434:5432"
+        volumes:
+            - pgdata:/var/lib/postgresql/data
+        networks:
+            - mynetwork
+
+networks:
+    mynetwork:
+        driver: bridge
+
+volumes:
+    pgdata:

@@ -1,0 +1,10 @@
+# Backend
+fastapi
+uvicorn
+
+# Database
+sqlalchemy
+psycopg2
+
+# Utilities
+dotenv
