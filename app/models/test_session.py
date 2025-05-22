@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Boolean, String, DateTime, ForeignKey, func
+from sqlalchemy import Column, Integer, Boolean, String, TIMESTAMP, ForeignKey, func
 from sqlalchemy.orm import relationship
 from .base import Base
 
@@ -7,8 +7,8 @@ class TestSession(Base):
 
     id = Column(Integer, primary_key=True)
     account_id = Column(Integer, ForeignKey('account.id'))
-    start_time = Column(DateTime, default=func.now())
-    end_time = Column(DateTime)
+    start_time = Column(TIMESTAMP, default=func.now())
+    end_time = Column(TIMESTAMP)
     completion_status = Column(String)
     predict_dyslexia = Column(Boolean)
 

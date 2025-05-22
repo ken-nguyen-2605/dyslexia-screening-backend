@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, TIMESTAMP, ForeignKey
 from sqlalchemy.orm import relationship
 from .base import Base
 
@@ -8,8 +8,8 @@ class LanguageFeatures(Base):
     id = Column(Integer, primary_key=True)
     test_session_id = Column(Integer, ForeignKey('test_session.id'))
 
-    start_time = Column(DateTime)
-    end_time = Column(DateTime)
+    start_time = Column(TIMESTAMP)
+    end_time = Column(TIMESTAMP)
 
     clicks = Column(Integer)
     hits = Column(Integer)

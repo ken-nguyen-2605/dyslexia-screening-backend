@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, DateTime, Text, ForeignKey
+from sqlalchemy import Column, Integer, TIMESTAMP, Text, ForeignKey
 from sqlalchemy.orm import relationship
 from .base import Base
 
@@ -9,7 +9,7 @@ class UserContext(Base):
     account_id = Column(Integer, ForeignKey('account.id'))
     last_test_session_id = Column(Integer, ForeignKey('test_session.id'))
     test_progress = Column(Text)
-    last_activity = Column(DateTime)
+    last_activity = Column(TIMESTAMP)
 
     account = relationship("Account", back_populates="user_contexts")
     test_session = relationship("TestSession", back_populates="user_contexts")

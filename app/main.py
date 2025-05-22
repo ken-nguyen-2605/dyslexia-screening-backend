@@ -3,12 +3,9 @@ from app.database import engine, Base
 from app.models import Base
 app = FastAPI()
  
-# # Create tables on startup
-# @app.on_event("startup")
-# def startup():
-#     Base.metadata.create_all(bind=engine)
-# Base.metadata.create_all(bind=engine)
-Base.metadata.create_all(bind=engine)
+@app.on_event("startup")
+def startup():
+    Base.metadata.create_all(bind=engine)
 
 @app.get("/")
 def read_root():

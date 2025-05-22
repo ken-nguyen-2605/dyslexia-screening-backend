@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, DateTime, Interval, Boolean, ForeignKey
+from sqlalchemy import Column, Integer, TIMESTAMP, Interval, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
 from .base import Base
 
@@ -8,8 +8,8 @@ class AuditoryFeatures(Base):
     id = Column(Integer, primary_key=True)
     test_session_id = Column(Integer, ForeignKey('test_session.id'))
 
-    start_time = Column(DateTime)
-    end_time = Column(DateTime)
+    start_time = Column(TIMESTAMP)
+    end_time = Column(TIMESTAMP)
     total_clicks = Column(Integer)
 
     first_click_interval = Column(Interval)
