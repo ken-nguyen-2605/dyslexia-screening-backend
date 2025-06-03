@@ -5,11 +5,11 @@ from .base import Base
 class VisualFeatures(Base):
     __tablename__ = 'visual_features'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     test_session_id = Column(Integer, ForeignKey('test_session.id'))
 
-    start_time = Column(TIMESTAMP)
-    end_time = Column(TIMESTAMP)
+    start_time = Column(TIMESTAMP(timezone=True), nullable=False)
+    end_time = Column(TIMESTAMP(timezone=True), nullable=False)
     total_clicks = Column(Integer)
 
     first_click_interval = Column(Interval)

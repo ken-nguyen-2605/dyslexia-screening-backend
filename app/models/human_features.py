@@ -5,12 +5,12 @@ from .base import Base
 class HumanFeatures(Base):
     __tablename__ = 'human_features'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     test_session_id = Column(Integer, ForeignKey('test_session.id'))
 
     age = Column(Integer)
-    gender = Column(String)
-    native_language = Column(String)
+    gender = Column(String(50))
+    native_language = Column(String(50))
     rl_dyslexia = Column(Boolean)
     has_played_similar_game = Column(Boolean)
 
