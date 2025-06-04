@@ -6,7 +6,7 @@ class AuditoryFeatures(Base):
     __tablename__ = 'auditory_features'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    test_session_id = Column(Integer, ForeignKey('test_session.id'))
+    test_session_id = Column(Integer, ForeignKey('test_sessions.id'))
 
     start_time = Column(TIMESTAMP(timezone=True), nullable=False)
     end_time = Column(TIMESTAMP(timezone=True), nullable=False)

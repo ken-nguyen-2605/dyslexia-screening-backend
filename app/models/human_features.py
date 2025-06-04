@@ -6,7 +6,7 @@ class HumanFeatures(Base):
     __tablename__ = 'human_features'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    test_session_id = Column(Integer, ForeignKey('test_session.id'))
+    test_session_id = Column(Integer, ForeignKey('test_sessions.id'))
 
     age = Column(Integer)
     gender = Column(String(50))
