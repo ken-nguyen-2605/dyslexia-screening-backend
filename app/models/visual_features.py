@@ -1,26 +1,27 @@
-from sqlalchemy import Column, Integer, TIMESTAMP, Interval, ForeignKey
-from sqlalchemy.orm import relationship
+from datetime import datetime, timedelta
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import ForeignKey
 from .base import Base
 
 class VisualFeatures(Base):
     __tablename__ = 'visual_features'
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    test_session_id = Column(Integer, ForeignKey('test_sessions.id'))
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    test_session_id: Mapped[int] = mapped_column(ForeignKey('test_sessions.id'))
 
-    start_time = Column(TIMESTAMP(timezone=True), nullable=False)
-    end_time = Column(TIMESTAMP(timezone=True), nullable=False)
-    total_clicks = Column(Integer)
+    start_time: Mapped[datetime] = mapped_column(nullable=False)
+    end_time: Mapped[datetime] = mapped_column(nullable=False)
+    total_clicks: Mapped[int | None] = mapped_column()
 
-    first_click_interval = Column(Interval)
-    second_click_interval = Column(Interval)
-    third_click_interval = Column(Interval)
-    fourth_click_interval = Column(Interval)
-    fifth_click_interval = Column(Interval)
-    sixth_click_interval = Column(Interval)
-    time_last_click = Column(Interval)
+    first_click_interval: Mapped[timedelta | None] = mapped_column()
+    second_click_interval: Mapped[timedelta | None] = mapped_column()
+    third_click_interval: Mapped[timedelta | None] = mapped_column()
+    fourth_click_interval: Mapped[timedelta | None] = mapped_column()
+    fifth_click_interval: Mapped[timedelta | None] = mapped_column()
+    sixth_click_interval: Mapped[timedelta | None] = mapped_column()
+    time_last_click: Mapped[timedelta | None] = mapped_column()
 
-    correct_answers = Column(Integer)
-    wrong_answers = Column(Integer)
+    correct_answers: Mapped[int | None] = mapped_column()
+    wrong_answers: Mapped[int | None] = mapped_column()
 
-    test_session = relationship("TestSession", back_populates="visual_features")
+    test_session: Mapped["TestSession"] = relationship(back_populates="visual_features")  # type: ignore

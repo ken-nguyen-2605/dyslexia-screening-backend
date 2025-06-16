@@ -12,7 +12,7 @@ from jwt.exceptions import InvalidTokenError, ExpiredSignatureError
 
 from app.env import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 from datetime import datetime, timedelta, timezone
-from app.models.enums import ParticipantTypeEnum
+from app.models.enums import ParticipantType
 
 # Security configurations
 bearer_security = HTTPBearer(auto_error=False)
@@ -66,7 +66,7 @@ def get_current_participant(request: Request, auth_header: HTTPAuthorizationCred
     
     participant = db.query(Participant).filter(Participant.id == participant_id).first()
     
-    if participant.participant_type == ParticipantTypeEnum.GUEST:
+    if participant.participant_type == ParticipantType.GUEST:
         guest = participant.guest_participant        
         return GuestParticipantOut(
             id=participant.id,
@@ -76,7 +76,7 @@ def get_current_participant(request: Request, auth_header: HTTPAuthorizationCred
             last_activity=guest.last_activity
         )
         
-    elif participant.participant_type == ParticipantTypeEnum.USER:
+    elif participant.participant_type == ParticipantType.USER:
         user = participant.user_participant
         return UserParticipantOut(
             id=participant.id,

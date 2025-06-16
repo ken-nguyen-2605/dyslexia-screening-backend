@@ -1,11 +1,11 @@
 from pydantic import BaseModel, EmailStr, Field
 from typing import Optional, Annotated
 from datetime import datetime
-from app.models.enums import ParticipantTypeEnum
+from app.models.enums import ParticipantType
 
 class ParticipantBase(BaseModel):
     id: Annotated[int, Field(..., description="Unique identifier for the participant")]
-    participant_type: Annotated[ParticipantTypeEnum, Field(..., description="Type of the participant (USER or GUEST)")]
+    participant_type: Annotated[ParticipantType, Field(..., description="Type of the participant (USER or GUEST)")]
     email: Annotated[EmailStr, Field(..., description="Email address of the participant")]
     created_at: Annotated[datetime, Field(..., description="Timestamp when the participant was created")]
     

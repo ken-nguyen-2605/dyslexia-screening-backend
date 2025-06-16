@@ -7,7 +7,7 @@ from app.utils.auth import hash_password, verify_password, create_access_token
 from app.models.participant import Participant
 from app.models.user_participant import UserParticipant
 from app.models.guest_participant import GuestParticipant
-from app.models.enums import ParticipantTypeEnum
+from app.models.enums import ParticipantType
 from app.schemas.auth import RegisterRequest, RegisterResponse, LoginRequest, LoginResponse, GuestRequest, GuestResponse
 
 router = APIRouter(
@@ -25,7 +25,7 @@ async def register(register_request: RegisterRequest, db: Session = Depends(get_
     
     participant = Participant(
         email=register_request.email,
-        participant_type=ParticipantTypeEnum.USER
+        participant_type=ParticipantType.USER
     )
     
     user_part = UserParticipant(
@@ -49,7 +49,7 @@ async def register(register_request: RegisterRequest, db: Session = Depends(get_
 async def login(login_request: LoginRequest, db: Session = Depends(get_db)):
     user_participant = db.query(Participant).filter(
         Participant.email == login_request.email,
-        Participant.participant_type == ParticipantTypeEnum.USER
+        Participant.participant_type == ParticipantType.USER
     ).first()
     
     if not user_participant or not verify_password(login_request.password, user_participant.user_participant.hashed_password):
@@ -68,7 +68,7 @@ async def login(login_request: LoginRequest, db: Session = Depends(get_db)):
 @router.post("/guest", response_model=GuestResponse)
 async def guest(guest_request: GuestRequest, db: Session = Depends(get_db)):
     guest = db.query(Participant).filter(Participant.email == guest_request.email).first()
-    if guest and guest.participant_type != ParticipantTypeEnum.GUEST:
+    if guest and guest.participant_type != ParticipantType.GUEST:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Email already registered as a user"
@@ -78,7 +78,7 @@ async def guest(guest_request: GuestRequest, db: Session = Depends(get_db)):
         guest_part = GuestParticipant(participant=guest)
         guest = Participant(
             email=guest_request.email,
-            participant_type=ParticipantTypeEnum.GUEST,
+            participant_type=ParticipantType.GUEST,
             guest_participant=guest_part
         )
         

@@ -1,21 +1,24 @@
-from sqlalchemy import Column, Integer, Boolean, String, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy import ForeignKey, String, Enum
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from .base import Base
+from .enums import Gender
 
 class HumanFeatures(Base):
     __tablename__ = 'human_features'
+    
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    test_session_id: Mapped[int] = mapped_column(ForeignKey('test_sessions.id'))
+    
+    # Before starting the test
+    age: Mapped[int] = mapped_column(nullable=False)
+    gender: Mapped[Gender] = mapped_column(Enum(Gender), nullable=False)
+    native_language: Mapped[str] = mapped_column(String(50), nullable=False)
+    rl_dyslexia: Mapped[bool] = mapped_column(nullable=False)
+    
+    # After completing the test
+    has_played_similar_game: Mapped[bool | None] = mapped_column()
+    visual_rating: Mapped[int | None] = mapped_column()
+    audio_rating: Mapped[int | None] = mapped_column()
+    language_rating: Mapped[int | None] = mapped_column()
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    test_session_id = Column(Integer, ForeignKey('test_sessions.id'))
-
-    age = Column(Integer)
-    gender = Column(String(50))
-    native_language = Column(String(50))
-    rl_dyslexia = Column(Boolean)
-    has_played_similar_game = Column(Boolean)
-
-    visual_rating = Column(Integer)
-    audio_rating = Column(Integer)
-    language_rating = Column(Integer)
-
-    test_session = relationship("TestSession", back_populates="human_features")
+    test_session: Mapped["TestSession"] = relationship(back_populates="human_feature")  # type: ignore

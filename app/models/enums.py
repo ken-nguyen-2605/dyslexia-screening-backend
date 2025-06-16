@@ -1,9 +1,13 @@
-import enum
+from enum import Enum
 
-class TestStatusEnum(enum.Enum):
+class TestStatus(Enum):
     COMPLETED = "COMPLETED"
     IN_PROGRESS = "IN_PROGRESS"
     
-class ParticipantTypeEnum(enum.Enum):
+class ParticipantType(Enum):
     USER = 'USER'
     GUEST = 'GUEST'
+    
+class Gender(Enum):
+    MALE = 'MALE'
+    FEMALE = 'FEMALE'
