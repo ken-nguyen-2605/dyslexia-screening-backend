@@ -11,4 +11,3 @@ class UserParticipant(Base):
     last_login = Column(TIMESTAMP(timezone=True), nullable=True)
     
     participant = relationship("Participant", back_populates="user_participant")
-    

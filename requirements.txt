@@ -8,3 +8,11 @@ psycopg2
 
 # Utilities
 dotenv
+email-validator
+
+
+# Password Hashing
+bcrypt
+
+# JWT
+pyjwt
