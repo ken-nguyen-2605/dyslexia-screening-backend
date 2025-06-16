@@ -19,10 +19,6 @@ class RegisterResponse(BaseModel):
     email: Annotated[EmailStr, Field(..., max_length=128, description="Email address of the user")]
     created_at: Annotated[datetime, Field(..., description="Timestamp when the user was created")]
 
-    model_config = {
-        "orm_mode": True
-    }
-
 # LOGIN SCHEMAS
 class LoginRequest(BaseModel):
     email: Annotated[EmailStr, Field(..., max_length=128, description="Email address of the user")]
@@ -31,3 +27,11 @@ class LoginRequest(BaseModel):
 class LoginResponse(Token):
     id: Annotated[int, Field(..., description="Unique identifier of the user")]
     
+# GUEST SCHEMAS
+class GuestRequest(BaseModel):
+    email: Annotated[EmailStr, Field(..., max_length=128, description="Email address of the guest")]
+
+class GuestResponse(Token):
+    id: Annotated[int, Field(..., description="Unique identifier of the guest")]
+    email: Annotated[EmailStr, Field(..., max_length=128, description="Email address of the guest")]
+    created_at: Annotated[datetime, Field(..., description="Timestamp when the guest was created")]
