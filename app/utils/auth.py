@@ -3,7 +3,6 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.schemas.participant import UserParticipantOut, GuestParticipantOut
 from app.models.participant import Participant
 
 import jwt
@@ -36,7 +35,7 @@ def create_access_token(data: dict[str]) -> str:
     
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
-def get_current_participant(request: Request, auth_header: HTTPAuthorizationCredentials = Depends(bearer_security), db: Session = Depends(get_db)) -> UserParticipantOut | GuestParticipantOut:
+def get_current_participant(request: Request, auth_header: HTTPAuthorizationCredentials = Depends(bearer_security), db: Session = Depends(get_db)) -> Participant:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -65,27 +64,11 @@ def get_current_participant(request: Request, auth_header: HTTPAuthorizationCred
         raise credentials_exception
     
     participant = db.query(Participant).filter(Participant.id == participant_id).first()
-    
-    if participant.participant_type == ParticipantType.GUEST:
-        guest = participant.guest_participant        
-        return GuestParticipantOut(
-            id=participant.id,
-            participant_type=participant.participant_type,
-            email=participant.email,
-            created_at=participant.created_at,
-            last_activity=guest.last_activity
+    if participant is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Participant not found",
+            headers={"WWW-Authenticate": "Bearer"},
         )
         
-    elif participant.participant_type == ParticipantType.USER:
-        user = participant.user_participant
-        return UserParticipantOut(
-            id=participant.id,
-            participant_type=participant.participant_type,
-            email=participant.email,
-            created_at=participant.created_at,
-            name=user.name,
-            last_login=user.last_login
-        )
-        
-    else:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Unknown participant type")
+    return participant
