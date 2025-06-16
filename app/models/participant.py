@@ -14,7 +14,7 @@ class Participant(Base):
     created_at: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True), server_default=func.now(), nullable=False)
     
     # Relationships
-    user_participant: Mapped["UserParticipant"] = relationship("UserParticipant", back_populates="participant", uselist=False)  # type: ignore
-    guest_participant: Mapped["GuestParticipant"] = relationship("GuestParticipant", back_populates="participant", uselist=False)  # type: ignore
-    test_sessions: Mapped["TestSession"] = relationship("TestSession", back_populates="participant")  # type: ignore
-    session_contexts: Mapped["SessionContext"] = relationship("SessionContext", back_populates="participant")  # type: ignore
+    user_participant: Mapped["UserParticipant"] = relationship("UserParticipant", back_populates="participant")  # type: ignore
+    guest_participant: Mapped["GuestParticipant"] = relationship("GuestParticipant", back_populates="participant")  # type: ignore
+    test_sessions: Mapped[list["TestSession"]] = relationship("TestSession", back_populates="participant")  # type: ignore
+    session_contexts: Mapped[list["SessionContext"]] = relationship("SessionContext", back_populates="participant")  # type: ignore
