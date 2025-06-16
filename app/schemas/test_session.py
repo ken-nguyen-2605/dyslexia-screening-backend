@@ -8,6 +8,7 @@ class TestStartRequest(BaseModel):
     pass
 
 class TestStartResponse(BaseModel):
-    test_id: Annotated[str, Field(..., description="Unique identifier for the test")]
+    id: Annotated[int, Field(..., description="Unique identifier for the test")]
+    participant_id: Annotated[int, Field(..., description="ID of the participant who started the test")]
     start_time: Annotated[datetime, Field(..., description="Start time of the test in ISO 8601 format")]
     completion_status: Annotated[TestStatus, Field(..., description="Status of the test completion")]
