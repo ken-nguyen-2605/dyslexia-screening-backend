@@ -7,18 +7,39 @@ from app.models.enums import (
     VisualQuestionType,
     LanguageQuestionType,
     QuestionCategory,
+    Gender,
+    AuditoryProgress,
+    VisualProgress,
+    LanguageProgress
 )
+# HUMAN SUBMISSION SCHEMA
+class InfoSubmissionBaseModel(BaseModel):
+    age: Annotated[int, Field(..., description="Age of the participant")]
+    gender: Annotated[Gender, Field(..., description="Gender of the participant")]
+    native_language: Annotated[str, Field(..., description="Native language of the participant")]
+    rl_dyslexia: Annotated[bool, Field(..., description="Whether the participant has dyslexia")]
+
+class InfoSubmissionRequest(InfoSubmissionBaseModel):
+    pass
+
+class InfoSubmissionResponse(InfoSubmissionBaseModel):
+    id: Annotated[int, Field(..., description="Unique identifier for the info submission")]
+    model_config = {
+        "from_attributes": True,
+    }
 
 # TEST START SCHEMA
 class TestStartRequest(BaseModel):
-    pass
+    info: Annotated[InfoSubmissionRequest, Field(..., description="Information about the participant before starting the test")]
 
 class TestStartResponse(BaseModel):
     id: Annotated[int, Field(..., description="Unique identifier for the test")]
     participant_id: Annotated[int, Field(..., description="ID of the participant who started the test")]
     start_time: Annotated[datetime, Field(..., description="Start time of the test in ISO 8601 format")]
     completion_status: Annotated[TestStatus, Field(..., description="Status of the test completion")]
-
+    auditory_progress: Annotated[AuditoryProgress, Field(..., description="Progress of the auditory test")]  
+    visual_progress: Annotated[VisualProgress, Field(..., description="Progress of the visual test")]
+    language_progress: Annotated[LanguageProgress, Field(..., description="Progress of the language test")]
 
 """
 Example JSON request:
