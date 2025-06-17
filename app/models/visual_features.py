@@ -24,4 +24,4 @@ class VisualFeatures(Base):
     correct_answers: Mapped[int | None] = mapped_column()
     wrong_answers: Mapped[int | None] = mapped_column()
 
-    test_session: Mapped["TestSession"] = relationship(back_populates="visual_feature")  # type: ignore
+    test_session: Mapped["TestSession"] = relationship(back_populates="visual_features")  # type: ignore

@@ -20,10 +20,10 @@ class TestSession(Base):
     
     # Relationships
     participant: Mapped["Participant"] = relationship("Participant", back_populates="test_sessions")  # type: ignore
-    human_feature: Mapped["HumanFeatures"] = relationship("HumanFeatures", uselist=False, back_populates="test_session")  # type: ignore
-    visual_feature: Mapped["VisualFeatures"] = relationship("VisualFeatures", uselist=False, back_populates="test_session")  # type: ignore
-    auditory_feature: Mapped["AuditoryFeatures"] = relationship("AuditoryFeatures", uselist=False, back_populates="test_session")  # type: ignore
-    language_feature: Mapped["LanguageFeatures"] = relationship("LanguageFeatures", uselist=False, back_populates="test_session")  # type: ignore
+    human_feature: Mapped["HumanFeatures"] = relationship("HumanFeatures", back_populates="test_session")  # type: ignore
+    visual_features: Mapped[list["VisualFeatures"]] = relationship("VisualFeatures", back_populates="test_session")  # type: ignore
+    auditory_features: Mapped[list["AuditoryFeatures"]] = relationship("AuditoryFeatures", back_populates="test_session")  # type: ignore
+    language_features: Mapped[list["LanguageFeatures"]] = relationship("LanguageFeatures", back_populates="test_session")  # type: ignore
     
     def __repr__(self):
         return f"<TestSession(id={self.id}, participant_id={self.participant_id}, start_time={self.start_time}, completion_status={self.completion_status})>"

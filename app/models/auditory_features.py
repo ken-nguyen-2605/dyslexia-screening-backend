@@ -25,4 +25,4 @@ class AuditoryFeatures(Base):
     logic: Mapped[bool | None] = mapped_column()
     instructions_viewed: Mapped[int | None] = mapped_column()
 
-    test_session: Mapped["TestSession"] = relationship(back_populates="auditory_feature") # type: ignore
+    test_session: Mapped["TestSession"] = relationship(back_populates="auditory_features") # type: ignore

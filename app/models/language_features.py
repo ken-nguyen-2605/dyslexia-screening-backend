@@ -16,4 +16,4 @@ class LanguageFeatures(Base):
     hits: Mapped[int | None] = mapped_column()
     misses: Mapped[int | None] = mapped_column()
     
-    test_session: Mapped["TestSession"] = relationship(back_populates="language_feature")  # type: ignore
+    test_session: Mapped["TestSession"] = relationship(back_populates="language_features")  # type: ignore
