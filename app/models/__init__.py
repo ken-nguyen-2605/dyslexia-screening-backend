@@ -7,5 +7,4 @@ from .human_features import HumanFeatures
 from .visual_features import VisualFeatures
 from .auditory_features import AuditoryFeatures
 from .language_features import LanguageFeatures
-from .session_context import SessionContext
 from .enums import TestStatus, ParticipantType

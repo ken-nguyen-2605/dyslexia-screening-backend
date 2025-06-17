@@ -17,4 +17,3 @@ class Participant(Base):
     user_participant: Mapped["UserParticipant"] = relationship("UserParticipant", back_populates="participant")  # type: ignore
     guest_participant: Mapped["GuestParticipant"] = relationship("GuestParticipant", back_populates="participant")  # type: ignore
     test_sessions: Mapped[list["TestSession"]] = relationship("TestSession", back_populates="participant")  # type: ignore
-    session_contexts: Mapped[list["SessionContext"]] = relationship("SessionContext", back_populates="participant")  # type: ignore
