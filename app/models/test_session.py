@@ -1,8 +1,8 @@
-from sqlalchemy import Column, Integer, Boolean, String, TIMESTAMP, ForeignKey, func, Enum
+from sqlalchemy import Boolean, TIMESTAMP, ForeignKey, func, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.dialects.postgresql import JSONB
 from datetime import datetime
-from typing import Optional, Dict, Any
+from .enums import AuditoryProgress, VisualProgress, LanguageProgress
 from .base import Base
 from .enums import TestStatus
 
@@ -16,7 +16,9 @@ class TestSession(Base):
     end_time: Mapped[datetime | None] = mapped_column(TIMESTAMP(timezone=True), nullable=True)
     completion_status: Mapped[TestStatus] = mapped_column(Enum(TestStatus), nullable=False)  # e.g., 'completed', 'in_progress'
     predict_dyslexia: Mapped[bool | None] = mapped_column(Boolean, nullable=True)
-    progress: Mapped[Optional[dict[str, Any]]] = mapped_column(JSONB, nullable=True)
+    auditory_progress: Mapped[AuditoryProgress] = mapped_column(Enum(AuditoryProgress), nullable=True)
+    visual_progress: Mapped[VisualProgress] = mapped_column(Enum(VisualProgress), nullable=True)
+    language_progress: Mapped[LanguageProgress] = mapped_column(Enum(LanguageProgress), nullable=True)
     
     # Relationships
     participant: Mapped["Participant"] = relationship("Participant", back_populates="test_sessions")  # type: ignore
