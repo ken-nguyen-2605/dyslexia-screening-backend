@@ -17,8 +17,8 @@ class HumanFeatures(Base):
     
     # After completing the test
     has_played_similar_game: Mapped[bool | None] = mapped_column()
+    auditory_rating: Mapped[int | None] = mapped_column()
     visual_rating: Mapped[int | None] = mapped_column()
-    audio_rating: Mapped[int | None] = mapped_column()
     language_rating: Mapped[int | None] = mapped_column()
 
     test_session: Mapped["TestSession"] = relationship(back_populates="human_feature")  # type: ignore
