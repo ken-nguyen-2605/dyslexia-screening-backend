@@ -9,7 +9,7 @@ class VisualFeatures(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     test_session_id: Mapped[int] = mapped_column(ForeignKey('test_sessions.id'))
-    type: Mapped[VisualQuestionType] = mapped_column(Enum(VisualQuestionType), nullable=False)
+    question_type: Mapped[VisualQuestionType] = mapped_column(Enum(VisualQuestionType), nullable=False)
 
     start_time: Mapped[datetime] = mapped_column(nullable=False)
     end_time: Mapped[datetime] = mapped_column(nullable=False)

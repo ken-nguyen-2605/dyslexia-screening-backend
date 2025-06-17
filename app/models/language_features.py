@@ -9,7 +9,7 @@ class LanguageFeatures(Base):
     
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     test_session_id: Mapped[int] = mapped_column(ForeignKey('test_sessions.id'))
-    type: Mapped[LanguageQuestionType] = mapped_column(Enum(LanguageQuestionType), nullable=False)
+    question_type: Mapped[LanguageQuestionType] = mapped_column(Enum(LanguageQuestionType), nullable=False)
     
     start_time: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True), nullable=False)
     end_time: Mapped[datetime] = mapped_column(TIMESTAMP(timezone=True), nullable=False)
