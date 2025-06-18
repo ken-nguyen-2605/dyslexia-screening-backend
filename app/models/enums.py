@@ -54,6 +54,7 @@ class AuditoryProgress(StrEnum):
     RISE_6_CARDS = AuditoryQuestionType.RISE_6_CARDS
     RHY_4_CARDS = AuditoryQuestionType.RHY_4_CARDS
     RHY_6_CARDS = AuditoryQuestionType.RHY_6_CARDS
+    FEEDBACK = "FEEDBACK"
     COMPLETED = "COMPLETED"
     
 class VisualProgress(StrEnum):
@@ -65,6 +66,7 @@ class VisualProgress(StrEnum):
     REC_6_CARDS = VisualQuestionType.REC_6_CARDS
     FACE_4_CARDS = VisualQuestionType.FACE_4_CARDS
     FACE_6_CARDS = VisualQuestionType.FACE_6_CARDS
+    FEEDBACK = "FEEDBACK"
     COMPLETED = "COMPLETED"
     
 class LanguageProgress(StrEnum):
@@ -74,4 +76,5 @@ class LanguageProgress(StrEnum):
     REMOVE_1_LETTER = LanguageQuestionType.REMOVE_1_LETTER
     ADD_1_LETTER = LanguageQuestionType.ADD_1_LETTER
     REPLACE_1_LETTER = LanguageQuestionType.REPLACE_1_LETTER
+    FEEDBACK = "FEEDBACK"
     COMPLETED = "COMPLETED"

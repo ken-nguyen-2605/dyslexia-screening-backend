@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, model_validator, field_validator
 from typing import Annotated, Optional
 from app.models.enums import TestStatus
 from datetime import datetime, timedelta
@@ -84,6 +84,29 @@ class TestProgressItem(BaseModel):
 class TestProgressRequest(BaseModel):
     id: Annotated[int, Field(..., description="Unique identifier for the test session")]
     questions: Annotated[list[TestProgressItem], Field(..., description="List of questions in the test session")]
+    
+    
+# RATING SCHEMAS
+class FeatureRating(BaseModel):
+    feature: Annotated[QuestionCategory, Field(..., description="Category of the question")]
+    rating: Annotated[int, Field(..., description="Rating for the feature on a scale of 1 to 5")]
+    
+    @field_validator('rating')
+    def validate_rating(cls, value):
+        if not (1 <= value <= 5):
+            raise ValueError("Rating must be between 1 and 5")
+        return value
+    
+class FeatureRatingRequest(FeatureRating):
+    pass
+
+class FeatureRatingResponse(FeatureRating):
+    id: Annotated[int, Field(..., description="Unique identifier for the feature rating")]
+    test_session_id: Annotated[int, Field(..., description="ID of the test session for which the rating was given")]
+    test_session_completion_status: Annotated[TestStatus, Field(..., description="Completion status of the test session")]
+    auditory_progress: Annotated[str, Field(..., description="Progress of the auditory test")]
+    visual_progress: Annotated[str, Field(..., description="Progress of the visual test")]
+    language_progress: Annotated[str, Field(..., description="Progress of the language test")]
     
 # AUDITORY SUBMISSION SCHEMA
 class AuditorySubmissionRequest(BaseModel):

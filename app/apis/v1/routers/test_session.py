@@ -12,7 +12,8 @@ from app.models.enums import (
     LanguageQuestionType,
     AuditoryProgress,
     VisualProgress,
-    LanguageProgress
+    LanguageProgress,
+    QuestionCategory
 )
 from app.models.auditory_features import AuditoryFeatures
 from app.models.visual_features import VisualFeatures
@@ -22,6 +23,8 @@ from app.schemas.test_session import (
     InfoSubmissionResponse,
     TestStartRequest,
     TestStartResponse,
+    FeatureRatingRequest,
+    FeatureRatingResponse,
     AuditorySubmissionRequest,
     AuditorySubmissionResponse,
     VisualSubmissionRequest,
@@ -194,7 +197,7 @@ async def submit_visual_features(
     if visual_attributes.question_type != test_session.visual_progress:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Visual question type does not match the current progress."
+            detail=f"Visual question type does not match the current progress: {test_session.visual_progress}"
         )
         
     visual_feature = VisualFeatures(
@@ -263,7 +266,7 @@ async def submit_language_features(
     if language_attributes.question_type != test_session.language_progress:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Language question type does not match the current progress."
+            detail=f"Language question type does not match the current progress: {test_session.language_progress}"
         )
         
     language_feature = LanguageFeatures(
@@ -291,3 +294,109 @@ async def submit_language_features(
     db.refresh(language_feature)
     db.refresh(test_session)
     return LanguageSubmissionResponse.model_validate(language_feature)
+
+@router.put("/{test_session_id}/rating", response_model=FeatureRatingResponse, status_code=status.HTTP_200_OK)
+async def feature_rating(
+    test_session_id: int,
+    feature_rating: FeatureRatingRequest,
+    db: Session = Depends(get_db),
+    current_participant=Depends(get_current_participant)
+) -> FeatureRatingResponse:
+    """
+    Submit a rating for a specific feature in the test session.
+    """
+    test_session = db.query(TestSession).filter(TestSession.id == test_session_id, TestSession.participant_id == current_participant.id).first()
+    if not test_session:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Test session not found."
+        )
+        
+    if test_session.completion_status != TestStatus.IN_PROGRESS:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Test session is not in progress."
+        )
+        
+    match feature_rating.feature:
+        case QuestionCategory.AUDITORY:
+            if test_session.auditory_progress == AuditoryProgress.COMPLETED:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Auditory features have already been rated."
+                )
+            if test_session.auditory_progress != AuditoryProgress.FEEDBACK:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Auditory features must be submitted before rating."
+                )
+            test_session.human_feature.auditory_rating = feature_rating.rating
+            test_session.auditory_progress = AuditoryProgress.COMPLETED
+            
+        case QuestionCategory.VISUAL:
+            if test_session.visual_progress == VisualProgress.COMPLETED:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Visual features have already been rated."
+                )
+            if test_session.visual_progress != VisualProgress.FEEDBACK:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Visual features must be submitted before rating."
+                )
+            test_session.human_feature.visual_rating = feature_rating.rating
+            test_session.visual_progress = VisualProgress.COMPLETED
+            
+        case QuestionCategory.LANGUAGE:
+            if test_session.language_progress == LanguageProgress.COMPLETED:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Language features have already been rated."
+                )
+            if test_session.language_progress != LanguageProgress.FEEDBACK:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Language features must be submitted before rating."
+                )
+            test_session.human_feature.language_rating = feature_rating.rating
+            test_session.language_progress = LanguageProgress.COMPLETED
+            
+        case _:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid feature type."
+            )
+        
+
+    if is_test_completed(test_session):
+        print("Test session is completed")
+        test_session.completion_status = TestStatus.COMPLETED
+        
+    db.add(test_session)
+    db.commit()
+    db.refresh(test_session)
+    
+    return FeatureRatingResponse(
+        id=test_session.human_feature.id,
+        test_session_id=test_session.id,
+        test_session_completion_status=test_session.completion_status,
+        auditory_progress=test_session.auditory_progress,
+        visual_progress=test_session.visual_progress,
+        language_progress=test_session.language_progress,
+        feature=feature_rating.feature,
+        rating=feature_rating.rating,
+    )
+        
+# UTILITIES FUNCTION
+def is_test_completed(test_session: TestSession):
+    """
+    Check if the test session is completed.
+    """
+    return (
+        test_session.auditory_progress == AuditoryProgress.COMPLETED and
+        test_session.visual_progress == VisualProgress.COMPLETED and
+        test_session.language_progress == LanguageProgress.COMPLETED and
+        test_session.human_feature.auditory_rating is not None and
+        test_session.human_feature.visual_rating is not None and
+        test_session.human_feature.language_rating is not None
+    )
