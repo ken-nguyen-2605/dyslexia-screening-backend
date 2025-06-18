@@ -115,10 +115,16 @@ async def submit_auditory_features(
             detail="Test session is not in progress."
         )
     
+    if test_session.auditory_progress == AuditoryProgress.COMPLETED:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Auditory part of the test is already completed."
+        )
+    
     if auditory_attributes.question_type != test_session.auditory_progress:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Auditory question type does not match the current progress."
+            detail=f"Auditory question type does not match the current progress: {test_session.auditory_progress}"
         )
         
     auditory_feature = AuditoryFeatures(
@@ -177,6 +183,12 @@ async def submit_visual_features(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Test session is not in progress."
+        )
+        
+    if test_session.visual_progress == VisualProgress.COMPLETED:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Visual part of the test is already completed."
         )
         
     if visual_attributes.question_type != test_session.visual_progress:
@@ -240,6 +252,12 @@ async def submit_language_features(
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Test session is not in progress."
+        )
+        
+    if test_session.language_progress == LanguageProgress.COMPLETED:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Language part of the test is already completed."
         )
         
     if language_attributes.question_type != test_session.language_progress:
