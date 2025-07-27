@@ -87,11 +87,6 @@ async def get_all_test_sessions_of_user(db: Session = Depends(get_db), current_p
         )
         
     test_sessions = db.query(TestSession).filter(TestSession.participant_id == current_participant.id).all()
-    if not test_sessions:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="No test sessions found for the current participant."
-        )
     return test_sessions
 
 @router.post("/{test_session_id}/auditory", response_model=AuditorySubmissionResponse, status_code=status.HTTP_201_CREATED)
