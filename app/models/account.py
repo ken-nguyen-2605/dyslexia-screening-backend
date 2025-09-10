@@ -1,8 +1,7 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import ForeignKey, TIMESTAMP, Enum, String, func
+from sqlalchemy import TIMESTAMP, String, func
 from .base import Base
-from .enums import AuditoryQuestionType
 
 class Account(Base):
     __tablename__ = 'accounts'

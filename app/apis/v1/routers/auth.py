@@ -27,7 +27,6 @@ async def register(register_request: RegisterRequest, db: Session = Depends(get_
         
     profile = Profile(
         profile_type=ProfileType.PARENT,
-        name=register_request.profile_name,
     )
     
     account = Account(
@@ -43,7 +42,6 @@ async def register(register_request: RegisterRequest, db: Session = Depends(get_
     return RegisterResponse(
         id=account.id,
         email=account.email,
-        profile_name=profile.name,
         created_at=account.created_at
     )
 
