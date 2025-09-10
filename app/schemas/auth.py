@@ -9,11 +9,15 @@ class Token(BaseModel):
     token_type: Annotated[str, Field(default="bearer", description="Type of the token, usually 'bearer'")]
     
 # PROFILE SCHEMAS
-class Profile(BaseModel):
+class ProfileSchema(BaseModel):
     id: Annotated[int, Field(..., description="Unique identifier of the profile")]
     profile_type: Annotated[ProfileType, Field(..., description="Type of the profile")]
     name: Annotated[str, Field(..., max_length=50, description="Display name of the profile")]
     created_at: Annotated[datetime, Field(..., description="Timestamp when the profile was created")]
+    
+    model_config = {
+        "from_attributes": True
+    }
     
 # REGISTER SCHEMAS
 class RegisterRequest(BaseModel):
@@ -33,5 +37,4 @@ class LoginRequest(BaseModel):
     password: Annotated[str, Field(..., min_length=8, max_length=128, description="Password for the user")]
     
 class LoginResponse(Token):
-    id: Annotated[int, Field(..., description="Unique identifier of the user")]
-    profiles: Annotated[list[Profile], Field(..., description="List of profiles associated with the user")]
+    pass

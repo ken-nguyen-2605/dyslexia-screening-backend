@@ -8,7 +8,7 @@ from app.models.account import Account
 from app.models.profile import Profile
 from app.models.enums import ProfileType
 
-from app.schemas.auth import RegisterRequest, RegisterResponse, LoginRequest, LoginResponse
+from app.schemas.auth import RegisterRequest, RegisterResponse, LoginRequest, Token
 
 router = APIRouter(
     prefix="/auth",
@@ -47,7 +47,7 @@ async def register(register_request: RegisterRequest, db: Session = Depends(get_
         created_at=account.created_at
     )
 
-@router.post("/login", response_model=LoginResponse)
+@router.post("/login", response_model=Token)
 async def login(login_request: LoginRequest, db: Session = Depends(get_db)):
     account = db.query(Account).filter(Account.email == login_request.email).first()
 
@@ -58,46 +58,5 @@ async def login(login_request: LoginRequest, db: Session = Depends(get_db)):
             headers={"WWW-Authenticate": "Bearer"}
         )
             
-    access_token = create_access_token(data={"sub": str(account.id)})
-    return LoginResponse(
-        id=account.id,
-        access_token=access_token,
-        profiles=[
-            Profile(
-                id=profile.id,
-                profile_type=profile.profile_type,
-                name=profile.name,
-                created_at=profile.created_at
-            ) for profile in account.profiles
-        ],
-        token_type="bearer"
-    )
-    
-# @router.post("/guest", response_model=GuestResponse)
-# async def guest(guest_request: GuestRequest, db: Session = Depends(get_db)):
-#     guest = db.query(Participant).filter(Participant.email == guest_request.email).first()
-#     if guest and guest.participant_type != ParticipantType.GUEST:
-#         raise HTTPException(
-#             status_code=status.HTTP_400_BAD_REQUEST,
-#             detail="Email already registered as a user"
-#         )
-    
-#     if not guest:
-#         guest_part = GuestParticipant(participant=guest)
-#         guest = Participant(
-#             email=guest_request.email,
-#             participant_type=ParticipantType.GUEST,
-#             guest_participant=guest_part
-#         )
-        
-#         db.add(guest)
-#         db.commit()
-#         db.refresh(guest)
-        
-#     access_token = create_access_token(data={"sub": str(guest.id)})
-#     return GuestResponse(
-#         id=guest.id,
-#         email=guest.email,
-#         access_token=access_token,
-#         created_at=guest.created_at
-#     )
+    access_token = create_access_token(data={"account_id": str(account.id)})
+    return {"access_token": access_token, "token_type": "bearer"}
