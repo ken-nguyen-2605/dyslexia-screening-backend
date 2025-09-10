@@ -4,9 +4,9 @@ class TestStatus(StrEnum):
     COMPLETED = "COMPLETED"
     IN_PROGRESS = "IN_PROGRESS"
     
-class ParticipantType(StrEnum):
-    USER = 'USER'
-    GUEST = 'GUEST'
+class ProfileType(StrEnum):
+    PARENT = 'PARENT'
+    CHILD = 'CHILD'
     
 class Gender(StrEnum):
     MALE = 'MALE'

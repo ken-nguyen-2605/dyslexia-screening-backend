@@ -6,7 +6,6 @@ from app.utils.auth import get_current_participant
 from app.models.test_session import TestSession
 from app.models.enums import (
     TestStatus,
-    ParticipantType,
     AuditoryQuestionType,
     VisualQuestionType,
     LanguageQuestionType,
