@@ -1,13 +1,17 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy import func
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError
 from app.database import get_db
 from app.utils.auth import get_current_profile
+
+from app.models.enums import TestStatus, QuestionType, PredictDyslexia
 from app.models.test_session import TestSession
 
 from app.schemas.test_session import (
     TestStartRequest,
     TestStartResponse,
+    TestSubmissionRequest,
+    TestSubmissionResponse
 )
 
 router = APIRouter(
@@ -17,6 +21,19 @@ router = APIRouter(
     dependencies=[Depends(get_current_profile)]
 )
 
+QUESTION_MAPPING = {
+    1: QuestionType.PHONEMIC_AWARENESS_1,
+    2: QuestionType.PHONEMIC_AWARENESS_2,
+    3: QuestionType.LETTER_RECOGNITION_1,
+    4: QuestionType.LETTER_RECOGNITION_2,
+    5: QuestionType.READING_COMPREHENSION_1,
+    6: QuestionType.READING_COMPREHENSION_2,
+    7: QuestionType.SPELLING_AND_WRITING_1,
+    8: QuestionType.SPELLING_AND_WRITING_2,
+    9: QuestionType.LANGUAGE_UNDERSTANDING_AND_RECOGNITION_1,
+    10: QuestionType.LANGUAGE_UNDERSTANDING_AND_RECOGNITION_2,
+}
+
 @router.post("/", response_model=TestStartResponse, status_code=status.HTTP_201_CREATED)
 async def start_test(test_start_request: TestStartRequest, db: Session = Depends(get_db), current_profile=Depends(get_current_profile)) -> TestStartResponse:
     """
@@ -24,7 +41,7 @@ async def start_test(test_start_request: TestStartRequest, db: Session = Depends
     """
     new_test_session = TestSession(
         profile_id=current_profile.id,
-        completion_status='IN_PROGRESS',
+        completion_status=TestStatus.IN_PROGRESS,
         test_difficulty=test_start_request.test_difficulty
     )
     
@@ -40,92 +57,86 @@ async def start_test(test_start_request: TestStartRequest, db: Session = Depends
         test_difficulty=new_test_session.test_difficulty
     )
     
-@router.get("/", response_model=list[TestStartResponse])
-async def get_all_test_sessions_of_user(db: Session = Depends(get_db), current_profile=Depends(get_current_profile)) -> list[TestStartResponse]:
+@router.get("/", response_model=list[TestSubmissionResponse])
+async def get_all_test_sessions_of_user(db: Session = Depends(get_db), current_profile=Depends(get_current_profile)) -> list[TestSubmissionResponse]:
     """
     Retrieve all test sessions for the current profile.
     """
     test_sessions = db.query(TestSession).filter(TestSession.profile_id == current_profile.id).all()
     return [
-        TestStartResponse(
+        TestSubmissionResponse(
             id=ts.id,
             profile_id=ts.profile_id,
             start_time=ts.start_time,
+            end_time=ts.end_time,
             completion_status=ts.completion_status,
-            test_difficulty=ts.test_difficulty
+            test_difficulty=ts.test_difficulty,
+            predict_dyslexia=ts.predict_dyslexia,
+            result=sum(1 for correct in ts.questions.values() if correct) if ts.questions else 0,
         ) for ts in test_sessions
     ]
 
-# @router.post("/{test_session_id}/auditory", response_model=AuditorySubmissionResponse, status_code=status.HTTP_201_CREATED)
-# async def submit_auditory_features(
-#     test_session_id: int,
-#     auditory_attributes: AuditorySubmissionRequest,
-#     db: Session = Depends(get_db),
-#     current_participant=Depends(get_current_participant)
-# ) -> AuditorySubmissionResponse:
-#     """
-#     Submit auditory features for a specific test session.
-#     """
-#     test_session = db.query(TestSession).filter(TestSession.id == test_session_id, TestSession.participant_id == current_participant.id).first()
+@router.post("/{test_session_id}/submit", status_code=status.HTTP_200_OK, response_model=TestSubmissionResponse)
+async def submit_test(
+    test_session_id: int,
+    test_submission_request: TestSubmissionRequest,
+    db: Session = Depends(get_db),
+    current_profile=Depends(get_current_profile)
+) -> TestSubmissionResponse:
+    """
+    Submit answers for a specific test session.
+    """
+    test_session = db.query(TestSession).filter(TestSession.id == test_session_id, TestSession.profile_id == current_profile.id).first()
     
-#     if not test_session:
-#         raise HTTPException(
-#             status_code=status.HTTP_404_NOT_FOUND,
-#             detail="Test session not found."
-#         )
+    if not test_session:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Test session not found."
+        )
         
-#     if test_session.completion_status != TestStatus.IN_PROGRESS:
-#         raise HTTPException(
-#             status_code=status.HTTP_400_BAD_REQUEST,
-#             detail="Test session is not in progress."
-#         )
-    
-#     if test_session.auditory_progress == AuditoryProgress.COMPLETED:
-#         raise HTTPException(
-#             status_code=status.HTTP_400_BAD_REQUEST,
-#             detail="Auditory part of the test is already completed."
-#         )
-    
-#     if auditory_attributes.question_type != test_session.auditory_progress:
-#         raise HTTPException(
-#             status_code=status.HTTP_400_BAD_REQUEST,
-#             detail=f"Auditory question type does not match the current progress: {test_session.auditory_progress}"
-#         )
+    if test_session.profile_id != current_profile.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You do not have permission to submit this test session."
+        )
         
-#     auditory_feature = AuditoryFeatures(
-#         test_session_id=test_session_id,
-#         question_type=auditory_attributes.question_type,
-#         start_time=auditory_attributes.start_time,
-#         end_time=auditory_attributes.end_time,
-#         first_click_interval=auditory_attributes.first_click_interval,
-#         second_click_interval=auditory_attributes.second_click_interval,
-#         third_click_interval=auditory_attributes.third_click_interval,
-#         fourth_click_interval=auditory_attributes.fourth_click_interval,
-#         fifth_click_interval=auditory_attributes.fifth_click_interval,
-#         sixth_click_interval=auditory_attributes.sixth_click_interval,
-#         duration_from_round=auditory_attributes.duration_from_round,
-#         duration_from_interaction=auditory_attributes.duration_from_interaction,
-#         total_clicks=auditory_attributes.total_clicks,
-#         logic=auditory_attributes.logic,
-#         instructions_viewed=auditory_attributes.instructions_viewed
-#     )
+    if test_session.completion_status != 'IN_PROGRESS':
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Test session is not in progress."
+        )
+        
+    # Map question_no to correct answer
+    questions_dict = {q.question_no: q.correct for q in test_submission_request.questions}
+    test_session.questions = questions_dict
     
-#     test_session.auditory_features.append(auditory_feature)
-#     test_session.auditory_progress = list(AuditoryProgress)[list(AuditoryProgress).index(auditory_attributes.question_type) + 1]
+    result = sum(1 for correct in questions_dict.values() if correct)
+    if result >= 7:
+        test_session.predict_dyslexia = PredictDyslexia.NO
+    elif 4 <= result < 7:
+        test_session.predict_dyslexia = PredictDyslexia.MAYBE
+    else:
+        test_session.predict_dyslexia = PredictDyslexia.YES
     
-#     db.add(auditory_feature)
-#     try:
-#         db.commit()
-#     except IntegrityError as e:
-#         db.rollback()
-#         raise HTTPException(
-#             status_code=status.HTTP_409_CONFLICT,
-#             detail="This type of auditory feature has already been submitted for this test session."
-#         )
-#     db.refresh(auditory_feature)
-#     db.refresh(test_session)
-#     return AuditorySubmissionResponse.model_validate(auditory_feature)
-
+    # Update test session status to COMPLETED
+    test_session.completion_status = TestStatus.COMPLETED
+    test_session.end_time = func.now()
+    
+    db.add(test_session)
+    db.commit()
+    db.refresh(test_session)
+    
+    return TestSubmissionResponse(
+        id=test_session.id,
+        profile_id=test_session.profile_id,
+        start_time=test_session.start_time,
+        end_time=test_session.end_time,
+        completion_status=test_session.completion_status,
+        test_difficulty=test_session.test_difficulty,
+        predict_dyslexia=test_session.predict_dyslexia,
+        result=result,
+    )
+    
 # @router.post("/{test_session_id}/visual", response_model=VisualSubmissionResponse, status_code=status.HTTP_201_CREATED)
 # async def submit_visual_features(
 #     test_session_id: int,

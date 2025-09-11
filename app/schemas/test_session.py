@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field, model_validator, field_validator
 from typing import Annotated
-from app.models.enums import TestStatus, TestDifficulty
-from datetime import datetime, timedelta
+from app.models.enums import TestStatus, TestDifficulty, PredictDyslexia
+from datetime import datetime
 
 # TEST START SCHEMA
 class TestStartRequest(BaseModel):
@@ -34,6 +34,56 @@ Example JSON request:
     ]
 }
 """
+# QUESTION SCHEMA
+class TestQuestion(BaseModel):
+    question_no: Annotated[int, Field(..., description="Question number in the test session")]
+    correct: Annotated[bool, Field(..., description="Whether the answer was correct")]
+
+# TEST SUBMISSION SCHEMA
+class TestSubmissionRequest(BaseModel):
+    questions: Annotated[list[TestQuestion], Field(..., description="List of questions in the test session")]
+    
+    @field_validator('questions')
+    def validate_questions(cls, value):
+        # Check if it contains exactly 10 questions
+        example_question_nos = set(range(1, 11))
+        received_question_nos = {q.question_no for q in value}
+        if received_question_nos != example_question_nos:
+            raise ValueError("Questions must contain exactly 10 questions with question_no from 1 to 10")
+        return value
+    
+    model_config = {
+        "json_schema_extra": {
+            "example": {
+                "questions": [
+                    {"question_no": 1, "correct": True},
+                    {"question_no": 2, "correct": False},
+                    {"question_no": 3, "correct": True},
+                    {"question_no": 4, "correct": True},
+                    {"question_no": 5, "correct": False},
+                    {"question_no": 6, "correct": True},
+                    {"question_no": 7, "correct": False},
+                    {"question_no": 8, "correct": True},
+                    {"question_no": 9, "correct": True},
+                    {"question_no": 10, "correct": False},
+                ]
+            }
+        }
+    }
+    
+class TestSubmissionResponse(BaseModel):
+    id: Annotated[int, Field(..., description="ID of the test session")]
+    profile_id: Annotated[int, Field(..., description="ID of the profile who took the test")]
+    start_time: Annotated[datetime, Field(..., description="Start time of the test session in ISO 8601 format")]
+    end_time: Annotated[datetime | None, Field(..., description="End time of the test session in ISO 8601 format")]
+    test_difficulty: Annotated[TestDifficulty, Field(..., description="Difficulty level of the test session")]
+    completion_status: Annotated[TestStatus, Field(..., description="Completion status of the test session")]
+    predict_dyslexia: Annotated[PredictDyslexia | None, Field(..., description="Prediction of dyslexia based on the test results")]
+    result: Annotated[int, Field(..., description="Total number of correct answers in the test session")]
+    
+    model_config = {
+        "from_attributes": True,
+    }
 
 # # TEST PROGRESS SCHEMA        
 # class TestProgressItem(BaseModel):
