@@ -12,7 +12,7 @@ class AccountSchema(BaseModel):
     model_config = {
         "from_attributes": True
     }
-    
+
 class AccountUpdateRequest(BaseModel):
     password: Annotated[str, Field(..., min_length=8, max_length=128, description="New password for the account")]
     
@@ -26,6 +26,10 @@ class ProfileSchema(BaseModel):
     model_config = {
         "from_attributes": True
     }
+    
+class ProfileCreateRequest(BaseModel):
+    profile_type: Annotated[ProfileType, Field(..., description="Type of the profile to create")]
+    name: Annotated[str, Field(..., max_length=50, description="Display name of the profile")]
     
 class ProfileSelectRequest(BaseModel):
     account_id: Annotated[int, Field(..., description="Unique identifier of the account")]

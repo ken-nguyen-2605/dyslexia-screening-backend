@@ -111,12 +111,12 @@ async def submit_test(
     test_session.questions = questions_dict
     
     result = sum(1 for correct in questions_dict.values() if correct)
-    if result >= 7:
+    if result > 7.5:
         test_session.predict_dyslexia = PredictDyslexia.NO
-    elif 4 <= result < 7:
-        test_session.predict_dyslexia = PredictDyslexia.MAYBE
-    else:
+    elif result < 2.5:
         test_session.predict_dyslexia = PredictDyslexia.YES
+    else:
+        test_session.predict_dyslexia = PredictDyslexia.MAYBE
     
     # Update test session status to COMPLETED
     test_session.completion_status = TestStatus.COMPLETED
