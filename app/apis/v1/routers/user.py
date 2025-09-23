@@ -2,38 +2,37 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import IntegrityError
 from app.database import get_db
-from app.utils.auth import get_current_participant
+from app.utils.auth import get_current_profile
 
-from app.models.participant import Participant
-from app.models.user_participant import UserParticipant
-from app.schemas.user import ProfileResponse
+from app.models.profile import Profile
+from app.schemas.auth import ProfileSchema, ProfileUpdateRequest
 
 router = APIRouter(
     prefix="/user",
     tags=["user"],
     responses={404: {"description": "Not found"}},
-    dependencies=[Depends(get_current_participant)]
+    dependencies=[Depends(get_current_profile)]
 )
 
-@router.get("/profile", response_model=ProfileResponse)
-async def get_profile(db: Session = Depends(get_db), current_participant: Participant = Depends(get_current_participant)) -> ProfileResponse:
+@router.get("/profile", response_model=ProfileSchema)
+async def get_profile(current_profile: Profile = Depends(get_current_profile)):
+    return current_profile
+
+@router.put("/profile", response_model=ProfileSchema)
+async def update_profile(updated_profile: ProfileUpdateRequest, db: Session = Depends(get_db), current_profile: Profile = Depends(get_current_profile)):
     """
-    Get the profile of the current user.
+    Update the current user's profile with the provided data.\n
+    Suggest for frontend:\n
+    Case 1: User updates in their own profile settings.\n
+    Case 2: When taking user details for the first time starting the test.
     """
+    for key, value in updated_profile.model_dump(exclude_unset=True).items():
+        setattr(current_profile, key, value)
     try:
-        user_participant = db.query(UserParticipant).filter(
-            UserParticipant.participant_id == current_participant.id
-        ).first()
-            
-        if not user_participant:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-        
-        return ProfileResponse(
-            id=current_participant.id,
-            name=user_participant.name,
-            email=current_participant.email,
-            created_at=current_participant.created_at
-        )
+        db.add(current_profile)
+        db.commit()
+        db.refresh(current_profile)
     except IntegrityError:
         db.rollback()
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Database error")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Profile update failed due to integrity error.")
+    return current_profile
