@@ -1,0 +1,12 @@
+-r requirements.txt
+
+# Development tools
+black   # Code formatter
+isort   # Import sorter
+docformatter  # Docstring formatter
+flake8  # Linting tool
+
+# Testing framework
+# pytest
+# pytest-asyncio  # For testing async code
+# httpx  # For making HTTP requests in tests
