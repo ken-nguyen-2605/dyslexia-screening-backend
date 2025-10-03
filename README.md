@@ -71,6 +71,13 @@ The API will be available at [http://localhost:8000](http://localhost:8000)
 
 Visit [http://localhost:8000/docs](http://localhost:8000/docs) for the interactive Swagger UI.
 
+### 7. Run pre-commit
+```
+pre-commit clean
+pre-commit install
+pre-commit run --all-files
+```
+
 ## Project Structure
 
 -   `app/` - Main application code

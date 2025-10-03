@@ -1,4 +1,0 @@
-[flake8]
-exclude = venv,__pycache__,migrations,build,dist
-max-line-length = 88
-extend-ignore = E203

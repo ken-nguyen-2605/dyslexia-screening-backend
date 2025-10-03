@@ -5,6 +5,7 @@ black   # Code formatter
 isort   # Import sorter
 docformatter  # Docstring formatter
 flake8  # Linting tool
+pre-commit  # Git hooks
 
 # Testing framework
 # pytest
