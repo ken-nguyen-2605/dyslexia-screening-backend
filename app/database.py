@@ -1,5 +1,6 @@
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import declarative_base, sessionmaker
+
 from app.env import DATABASE_URL
 
 # Create a new SQLAlchemy engine instance
@@ -12,6 +13,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 # Create a Base class
 Base = declarative_base()
 
+
 # Dependency
 def get_db():
     db = SessionLocal()
@@ -19,6 +21,7 @@ def get_db():
         yield db
     finally:
         db.close()
+
 
 # Test
 def test_db():
@@ -30,6 +33,7 @@ def test_db():
         print(f"Database connection failed: {e}")
     finally:
         db.close()
+
 
 # Run the test. if the script is executed directly
 if __name__ == "__main__":

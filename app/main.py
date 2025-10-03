@@ -1,11 +1,10 @@
 from fastapi import FastAPI
-from app.database import engine, Base
-from app.models import Base
 from fastapi.middleware.cors import CORSMiddleware
-
 
 # Import routers
 from app.apis.v1.endpoints import router as api_router
+from app.database import Base, engine
+from app.models import Base
 
 app = FastAPI()
 
@@ -23,9 +22,11 @@ app.add_middleware(
 # Include api routers
 app.include_router(api_router)
 
+
 @app.on_event("startup")
 def startup():
     Base.metadata.create_all(bind=engine)
+
 
 @app.get("/")
 def read_root():
