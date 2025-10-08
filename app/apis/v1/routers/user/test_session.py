@@ -128,6 +128,11 @@ async def start_specific_test(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Auditory test has already been taken in this session.",
                 )
+            if test_session.auditory_test:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Auditory test has already been started in this session.",
+                )
             auditory_test = AuditoryTest(
                 test_session_id=test_session.id,
                 score=None,
@@ -141,6 +146,11 @@ async def start_specific_test(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Visual test has already been taken in this session.",
                 )
+            if test_session.visual_test:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Visual test has already been started in this session.",
+                )
             visual_test = VisualTest(
                 test_session_id=test_session.id,
                 score=None,
@@ -153,6 +163,11 @@ async def start_specific_test(
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Language test has already been taken in this session.",
+                )
+            if test_session.language_test:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Language test has already been started in this session.",
                 )
             language_test = LanguageTest(
                 test_session_id=test_session.id,
