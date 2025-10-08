@@ -29,6 +29,7 @@ async def register(
 
     profile = Profile(
         profile_type=ProfileType.PARENT,
+        name=register_request.name,
     )
 
     account = Account(

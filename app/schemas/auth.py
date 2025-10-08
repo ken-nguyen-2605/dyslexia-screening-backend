@@ -29,6 +29,9 @@ class RegisterRequest(BaseModel):
         str,
         Field(..., min_length=8, max_length=128, description="Password for the user"),
     ]
+    name: Annotated[
+        str, Field(..., max_length=128, description="Full name of the user")
+    ]
 
 
 class RegisterResponse(BaseModel):
