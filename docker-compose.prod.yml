@@ -1,0 +1,48 @@
+name: eureka-backend
+
+services:
+  db:
+    image: postgres:17-alpine
+    container_name: eureka-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: dyslexia
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - eureka-network
+    restart: always
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: eureka-api
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@db:5432/dyslexia
+      SECRET_KEY: GL7C6TJg3WqRHlrvWXxIkPXBc8VHu4o1wFghuUg5mTT
+      ALGORITHM: HS256
+      ACCESS_TOKEN_EXPIRE_MINUTES: 30
+      REFRESH_TOKEN_EXPIRE_MINUTES: 10080
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - eureka-network
+    restart: always
+    
+volumes:
+  postgres-data:
+    driver: local
+
+networks:
+  eureka-network:
+    driver: bridge
