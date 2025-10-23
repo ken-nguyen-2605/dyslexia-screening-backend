@@ -10,7 +10,7 @@ from app.apis.v1.endpoints import router as api_router
 app = FastAPI()
 
 origins = [
-    "http://localhost:5173",
+    "*",
 ]
 app.add_middleware(
     CORSMiddleware,
@@ -30,3 +30,7 @@ def startup():
 @app.get("/")
 def read_root():
     return {"message": "Welcome to Slide4Church API!"}
+
+@app.get("/api/health")
+def health():
+    return {"status": "ok"}
