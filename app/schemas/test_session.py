@@ -36,7 +36,7 @@ class TestSessionSchema(BaseModel):
     result: Annotated[
         TestResult | None, Field(..., description="Result of the test session")
     ]
-    score: Annotated[
+    total_score: Annotated[
         float | None,
         Field(..., description="Overall score of the test session over 100"),
     ]
@@ -55,29 +55,32 @@ class SpecificTestSessionCreateSchema(BaseModel):
 
 
 class SpecificTestSessionSchema(BaseModel):
-    id: Annotated[
-        int, Field(..., description="Unique identifier for the auditory test session")
-    ]
+    id: Annotated[int, Field(..., description="Unique identifier for the specific test session")]
     test_session_id: Annotated[
         int, Field(..., description="ID of the associated test session")
     ]
     score: Annotated[
-        float | None, Field(..., description="Score of the auditory test over 100")
+        float | None, Field(..., description="score of the auditory test over 100")
     ]
     test_details: Annotated[
         dict | None,
         Field(..., description="Details of the auditory test in JSON format"),
     ]
 
-
-class SpecificTestSessionSubmitSchema(SpecificTestSessionSchema):
+class SpecificTestSessionSubmitSchema(BaseModel):
+    score: Annotated[
+        float | None, Field(..., description="score of the auditory test over 100")
+    ]
+    test_details: Annotated[
+        dict | None,
+        Field(..., description="Details of the auditory test in JSON format"),
+    ]
     test_type: Annotated[
         TestType,
         Field(
             ..., description="Type of the test, e.g., 'AUDITORY', 'VISUAL', 'LANGUAGE'"
         ),
     ]
-
 
 """
 Example JSON request:

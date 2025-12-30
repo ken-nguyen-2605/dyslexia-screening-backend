@@ -64,18 +64,3 @@ async def login(login_request: LoginRequest, db: Session = Depends(get_db)):
         data={"account_id": str(account.id), "role": account.role.value}
     )
     return {"access_token": access_token, "token_type": "bearer"}
-
-
-@router.post("/verify-email")
-async def verify_email(email: str, db: Session = Depends(get_db)):
-    """Verify if the email is already registered by sending a verification link to the
-    user's email."""
-    account = db.query(Account).filter(Account.email == email).first()
-    return {"is_registered": account is not None}
-
-
-@router.post("/forgot-password")
-async def forgot_password(email: str):
-    """Send a password reset link to the user's email if it has already been
-    verified."""
-    return {"message": "Password reset link sent if the email is registered."}

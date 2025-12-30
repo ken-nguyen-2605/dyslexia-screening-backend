@@ -48,23 +48,10 @@ async def create_profile(
     db.refresh(new_profile)
     return new_profile
 
-
 @router.get("/profiles", response_model=list[ProfileSchema])
 async def get_profiles(current_account: Account = Depends(get_current_account)):
     """Get all profiles associated with the current account."""
     return current_account.profiles
-
-
-"""ATTENTION: The endpoints below require profile selection."""
-
-
-@router.get("/profiles/me", response_model=ProfileSchema)
-async def get_current_profile(
-    current_profile: Profile = Depends(get_current_profile_middleware),
-):
-    """ATTENTION: The endpoints below require profile selection."""
-    return current_profile
-
 
 @router.get("/profiles/{profile_id}", response_model=ProfileSchema)
 async def get_profile(

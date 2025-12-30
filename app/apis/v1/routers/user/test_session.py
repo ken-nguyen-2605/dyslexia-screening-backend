@@ -82,116 +82,116 @@ async def start_test(
     return new_test_session
 
 
-@router.post(
-    "/{test_session_id}/",
-    response_model=SpecificTestSessionSchema,
-    status_code=status.HTTP_201_CREATED,
-)
-async def start_specific_test(
-    test_session_id: int,
-    specific_test_request: SpecificTestSessionCreateSchema,
-    db: Session = Depends(get_db),
-    current_profile=Depends(get_current_profile),
-):
-    """Start a specific test (auditory, visual, language) within an existing test session."""
-    test_session = (
-        db.query(TestSession)
-        .filter(
-            TestSession.id == test_session_id,
-            TestSession.profile_id == current_profile.id,
-        )
-        .first()
-    )
+# @router.post(
+#     "/{test_session_id}/",
+#     response_model=SpecificTestSessionSchema,
+#     status_code=status.HTTP_201_CREATED,
+# )
+# async def start_specific_test(
+#     test_session_id: int,
+#     specific_test_request: SpecificTestSessionCreateSchema,
+#     db: Session = Depends(get_db),
+#     current_profile=Depends(get_current_profile),
+# ):
+#     """Start a specific test (auditory, visual, language) within an existing test session."""
+#     test_session = (
+#         db.query(TestSession)
+#         .filter(
+#             TestSession.id == test_session_id,
+#             TestSession.profile_id == current_profile.id,
+#         )
+#         .first()
+#     )
 
-    # Validate test session existence and status
-    if not test_session:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Test session not found."
-        )
+#     # Validate test session existence and status
+#     if not test_session:
+#         raise HTTPException(
+#             status_code=status.HTTP_404_NOT_FOUND, detail="Test session not found."
+#         )
 
-    if test_session.profile_id != current_profile.id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="You do not have permission to start a test in this session.",
-        )
+#     if test_session.profile_id != current_profile.id:
+#         raise HTTPException(
+#             status_code=status.HTTP_403_FORBIDDEN,
+#             detail="You do not have permission to start a test in this session.",
+#         )
 
-    if test_session.completed:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Test session is not in progress.",
-        )
+#     if test_session.completed:
+#         raise HTTPException(
+#             status_code=status.HTTP_400_BAD_REQUEST,
+#             detail="Test session is not in progress.",
+#         )
 
-    match specific_test_request.test_type:
-        case TestType.AUDITORY:
-            if test_session.taken_auditory_test:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Auditory test has already been taken in this session.",
-                )
-            if test_session.auditory_test:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Auditory test has already been started in this session.",
-                )
-            auditory_test = AuditoryTest(
-                test_session_id=test_session.id,
-                score=None,
-                test_details={},
-            )
-            test_session.auditory_test = auditory_test
+#     match specific_test_request.test_type:
+#         case TestType.AUDITORY:
+#             if test_session.taken_auditory_test:
+#                 raise HTTPException(
+#                     status_code=status.HTTP_400_BAD_REQUEST,
+#                     detail="Auditory test has already been taken in this session.",
+#                 )
+#             if test_session.auditory_test:
+#                 raise HTTPException(
+#                     status_code=status.HTTP_400_BAD_REQUEST,
+#                     detail="Auditory test has already been started in this session.",
+#                 )
+#             auditory_test = AuditoryTest(
+#                 test_session_id=test_session.id,
+#                 score=None,
+#                 test_details={},
+#             )
+#             test_session.auditory_test = auditory_test
 
-        case TestType.VISUAL:
-            if test_session.taken_visual_test:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Visual test has already been taken in this session.",
-                )
-            if test_session.visual_test:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Visual test has already been started in this session.",
-                )
-            visual_test = VisualTest(
-                test_session_id=test_session.id,
-                score=None,
-                test_details={},
-            )
-            test_session.visual_test = visual_test
+#         case TestType.VISUAL:
+#             if test_session.taken_visual_test:
+#                 raise HTTPException(
+#                     status_code=status.HTTP_400_BAD_REQUEST,
+#                     detail="Visual test has already been taken in this session.",
+#                 )
+#             if test_session.visual_test:
+#                 raise HTTPException(
+#                     status_code=status.HTTP_400_BAD_REQUEST,
+#                     detail="Visual test has already been started in this session.",
+#                 )
+#             visual_test = VisualTest(
+#                 test_session_id=test_session.id,
+#                 score=None,
+#                 test_details={},
+#             )
+#             test_session.visual_test = visual_test
 
-        case TestType.LANGUAGE:
-            if test_session.taken_language_test:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Language test has already been taken in this session.",
-                )
-            if test_session.language_test:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Language test has already been started in this session.",
-                )
-            language_test = LanguageTest(
-                test_session_id=test_session.id,
-                score=None,
-                test_details={},
-            )
-            test_session.language_test = language_test
+#         case TestType.LANGUAGE:
+#             if test_session.taken_language_test:
+#                 raise HTTPException(
+#                     status_code=status.HTTP_400_BAD_REQUEST,
+#                     detail="Language test has already been taken in this session.",
+#                 )
+#             if test_session.language_test:
+#                 raise HTTPException(
+#                     status_code=status.HTTP_400_BAD_REQUEST,
+#                     detail="Language test has already been started in this session.",
+#                 )
+#             language_test = LanguageTest(
+#                 test_session_id=test_session.id,
+#                 score=None,
+#                 test_details={},
+#             )
+#             test_session.language_test = language_test
 
-        case _:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid test type."
-            )
+#         case _:
+#             raise HTTPException(
+#                 status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid test type."
+#             )
 
-    db.add(test_session)
-    db.commit()
-    db.refresh(test_session)
+#     db.add(test_session)
+#     db.commit()
+#     db.refresh(test_session)
 
-    match specific_test_request.test_type:
-        case TestType.AUDITORY:
-            return test_session.auditory_test
-        case TestType.VISUAL:
-            return test_session.visual_test
-        case TestType.LANGUAGE:
-            return test_session.language_test
+#     match specific_test_request.test_type:
+#         case TestType.AUDITORY:
+#             return test_session.auditory_test
+#         case TestType.VISUAL:
+#             return test_session.visual_test
+#         case TestType.LANGUAGE:
+#             return test_session.language_test
 
 
 @router.post(
@@ -228,17 +228,20 @@ async def submit_test(
 
     match test_submission_request.test_type:
         case TestType.AUDITORY:
-            if not test_session.auditory_test:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Auditory test has not been started in this session.",
-                )
-
             if test_session.taken_auditory_test:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Auditory test has already been submitted in this session.",
                 )
+
+            # Create auditory test if it doesn't exist
+            if not test_session.auditory_test:
+                auditory_test = AuditoryTest(
+                    test_session_id=test_session.id,
+                    score=None,
+                    test_details={},
+                )
+                test_session.auditory_test = auditory_test
 
             test_session.auditory_test.score = test_submission_request.score
             test_session.auditory_test.test_details = (
@@ -247,31 +250,41 @@ async def submit_test(
             test_session.taken_auditory_test = True
 
         case TestType.VISUAL:
-            if not test_session.visual_test:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Visual test has not been started in this session.",
-                )
             if test_session.taken_visual_test:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Visual test has already been submitted in this session.",
                 )
+
+            # Create visual test if it doesn't exist
+            if not test_session.visual_test:
+                visual_test = VisualTest(
+                    test_session_id=test_session.id,
+                    score=None,
+                    test_details={},
+                )
+                test_session.visual_test = visual_test
+
             test_session.visual_test.score = test_submission_request.score
             test_session.visual_test.test_details = test_submission_request.test_details
             test_session.taken_visual_test = True
 
         case TestType.LANGUAGE:
-            if not test_session.language_test:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="Language test has not been started in this session.",
-                )
             if test_session.taken_language_test:
                 raise HTTPException(
                     status_code=status.HTTP_400_BAD_REQUEST,
                     detail="Language test has already been submitted in this session.",
                 )
+
+            # Create language test if it doesn't exist
+            if not test_session.language_test:
+                language_test = LanguageTest(
+                    test_session_id=test_session.id,
+                    score=None,
+                    test_details={},
+                )
+                test_session.language_test = language_test
+
             test_session.language_test.score = test_submission_request.score
             test_session.language_test.test_details = (
                 test_submission_request.test_details
@@ -291,7 +304,7 @@ async def submit_test(
 
         test_session.completed = True
         test_session.end_time = func.now()
-        test_session.score, test_session.result = calc_overall_result(test_session)
+        test_session.total_score, test_session.result = calc_overall_result(test_session)
 
     db.add(test_session)
     db.commit()

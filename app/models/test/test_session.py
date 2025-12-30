@@ -24,7 +24,7 @@ class TestSession(Base):
     taken_visual_test: Mapped[bool] = mapped_column(default=False)
     taken_language_test: Mapped[bool] = mapped_column(default=False)
     result: Mapped[TestResult | None] = mapped_column(Enum(TestResult), nullable=True)
-    score: Mapped[float | None] = mapped_column(nullable=True)  # Over 100
+    total_score: Mapped[float | None] = mapped_column(nullable=True)  # Over 100
 
     profile: Mapped["Profile"] = relationship(back_populates="test_sessions")  # type: ignore
     auditory_test: Mapped["AuditoryTest"] = relationship(  # type: ignore
