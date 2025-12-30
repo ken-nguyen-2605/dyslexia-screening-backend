@@ -36,3 +36,18 @@ class TestSession(Base):
     language_test: Mapped["LanguageTest"] = relationship(  # type: ignore
         back_populates="test_session", uselist=False, cascade="all, delete-orphan"
     )
+
+    @property
+    def auditory_score(self) -> float | None:
+        """Get the auditory test score if available."""
+        return self.auditory_test.score if self.auditory_test else None
+
+    @property
+    def visual_score(self) -> float | None:
+        """Get the visual test score if available."""
+        return self.visual_test.score if self.visual_test else None
+
+    @property
+    def language_score(self) -> float | None:
+        """Get the language test score if available."""
+        return self.language_test.score if self.language_test else None

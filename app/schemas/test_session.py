@@ -40,6 +40,18 @@ class TestSessionSchema(BaseModel):
         float | None,
         Field(..., description="Overall score of the test session over 100"),
     ]
+    auditory_score: Annotated[
+        float | None,
+        Field(None, description="Score of the auditory test over 100"),
+    ]
+    visual_score: Annotated[
+        float | None,
+        Field(None, description="Score of the visual test over 100"),
+    ]
+    language_score: Annotated[
+        float | None,
+        Field(None, description="Score of the language test over 100"),
+    ]
 
     model_config = ConfigDict(from_attributes=True)
 
