@@ -5,6 +5,7 @@ uvicorn
 # Database
 sqlalchemy
 psycopg2
+alembic
 
 # Utilities
 dotenv

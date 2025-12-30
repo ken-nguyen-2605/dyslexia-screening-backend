@@ -1,7 +1,7 @@
 from enum import StrEnum
 from sqlalchemy import String, Enum
 from sqlalchemy.orm import Mapped, mapped_column
-from ..base import Base
+from app.database import Base
 from sqlalchemy import TIMESTAMP, func
 from datetime import datetime
 from sqlalchemy.dialects.postgresql import JSONB

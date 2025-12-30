@@ -4,7 +4,7 @@ from sqlalchemy import TIMESTAMP, Enum, ForeignKey, func
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from ..base import Base
+from app.database import Base
 from ..enums import TestResult
 
 

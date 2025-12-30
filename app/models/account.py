@@ -3,7 +3,7 @@ from datetime import datetime
 from sqlalchemy import TIMESTAMP, Enum, String, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from .base import Base
+from app.database import Base
 from .enums import AccountRole
 
 

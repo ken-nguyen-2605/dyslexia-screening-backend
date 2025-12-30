@@ -2,7 +2,7 @@ from sqlalchemy import ForeignKey
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
-from ..base import Base
+from app.database import Base
 
 
 class LanguageTest(Base):
