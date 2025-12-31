@@ -8,7 +8,7 @@ from app.models.minigame.minigame import MinigameNumber
 
 class MinigameBase(BaseModel):
     minigame_number: Annotated[MinigameNumber, Field(description="The number of the minigame.")]
-    score: Annotated[float, Field(description="The score achieved in the minigame, out of 5.")]
+    score: Annotated[float, Field(description="The score achieved in the minigame, from 0 to 100.")]
     minigame_details: Annotated[dict, Field(description="Detailed information about the minigame attempt.")]
     attempted_at: Annotated[datetime, Field(description="The timestamp when the minigame was attempted.")]
     
